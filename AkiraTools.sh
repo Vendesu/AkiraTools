@@ -54,22 +54,9 @@ periksa_lisensi() {
 install_dependencies() {
     animasi_loading 3 "Menginstall dependensi"
     
-    # Update package list
     sudo apt-get update
-
-    # Install Python dan pip jika belum ada
-    sudo apt-get install -y python3 python3-pip
-
-    # Install screen
-    sudo apt-get install -y screen
-
-    # Install wget if not already installed
-    sudo apt-get install -y wget
-
-    # Install modul Python yang dibutuhkan
+    sudo apt-get install -y python3 python3-pip screen wget unzip
     pip3 install telethon requests beautifulsoup4
-
-    # Tambahkan modul lain yang mungkin dibutuhkan di sini
 }
 
 subproses_instalasi() {
@@ -82,33 +69,19 @@ subproses_instalasi() {
     
     animasi_loading 3 "Mengkonfigurasi sistem"
     
-    cat > /usr/local/bin/akiratools << EOL
-#!/bin/bash
+    chmod +x akiratools.py
+    
+    animasi_loading 2 "Membersihkan"
+}
 
-# Fungsi untuk menjalankan akiratools dalam screen
-run_akiratools() {
-    screen -S akiratools -d -m python3 ~/akiratools.py
+jalankan_dalam_screen() {
+    screen -S akiratools -d -m ./akiratools.py
     echo -e "${HIJAU}Sesi screen 'akiratools' telah dimulai.${NORMAL}"
     echo -e "${BIRU}Untuk melihat sesi, ketik: ${KUNING}screen -r akiratools${NORMAL}"
     echo -e "${BIRU}Untuk keluar dari sesi tanpa menghentikannya, tekan: ${KUNING}Ctrl+A kemudian D${NORMAL}"
 }
 
-# Periksa apakah sesi screen sudah ada
-if screen -list | grep -q "akiratools"; then
-    echo -e "${KUNING}Sesi screen 'akiratools' sudah berjalan.${NORMAL}"
-    echo -e "${BIRU}Untuk melihat sesi yang sudah ada, ketik: ${KUNING}screen -r akiratools${NORMAL}"
-else
-    run_akiratools
-fi
-EOL
-
-    chmod +x /usr/local/bin/akiratools
-    
-    animasi_loading 2 "Membersihkan"
-}
-
 utama() {
-    # Animasi loading di awal script
     animasi_loading 3 "Memulai instalasi"
 
     tampilkan_banner
@@ -126,14 +99,11 @@ utama() {
     
     echo "$username" > ~/.lisensi_otomasi_telegram
     
-    # Install dependencies
     install_dependencies
     
-    # Menjalankan subproses instalasi
     subproses_instalasi &
     PID=$!
 
-    # Menampilkan animasi loading selama subproses berjalan
     while kill -0 $PID 2>/dev/null; do
         for i in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
             echo -ne "\r${CYAN}$i Instalasi sedang berlangsung...${NORMAL}"
@@ -141,12 +111,12 @@ utama() {
         done
     done
 
-    # Menunggu subproses selesai
     wait $PID
     
     echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
-    echo -e "${BIRU}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${KUNING}akiratools${NORMAL}"
-    echo -e "${BIRU}Saat Anda menjalankan akiratools, sesi screen akan dibuat secara otomatis.${NORMAL}"
+    echo -e "${BIRU}Menjalankan akiratools dalam screen...${NORMAL}"
+    
+    jalankan_dalam_screen
 }
 
 utama
