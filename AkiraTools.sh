@@ -42,7 +42,7 @@ tampilkan_banner() {
 periksa_lisensi() {
     local username="$1"
     local lisensi
-    lisensi=$(wget -qO- "$URL_LISENSI")
+    lisensi=$(curl -s "$URL_LISENSI")
     
     if echo "$lisensi" | grep -qi "^$username,"; then
         return 0
@@ -54,34 +54,68 @@ periksa_lisensi() {
 install_dependencies() {
     animasi_loading 3 "Menginstall dependensi"
     
+    # Update package list
     sudo apt-get update
-    sudo apt-get install -y python3 python3-pip screen wget unzip
+
+    # Install Python dan pip jika belum ada
+    sudo apt-get install -y python3 python3-pip
+
+    # Install screen
+    sudo apt-get install -y screen
+
+    # Install modul Python yang dibutuhkan
     pip3 install telethon requests beautifulsoup4
+
+    # Tambahkan modul lain yang mungkin dibutuhkan di sini
 }
 
 subproses_instalasi() {
     animasi_loading 3 "Menyiapkan lingkungan"
     animasi_loading 5 "Mengunduh komponen"
     
-    wget -q https://github.com/Vendesu/AkiraTools/raw/main/akira.zip
-    unzip -q akira.zip
-    rm akira.zip
+    sudo curl -s -o /usr/bin/akiratools.py https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/akiratools.py
+    sudo curl -s -o /usr/bin/grabgrup.py https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/grabgrup.py
+    sudo curl -s -o /usr/bin/grup.py https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/grup.py
+    sudo curl -s -o /usr/bin/spamori.py https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/spamori.py
+    sudo curl -s -o /usr/bin/spamup.py https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/spamup.py
     
     animasi_loading 3 "Mengkonfigurasi sistem"
     
-    chmod +x akiratools.py
-    
-    animasi_loading 2 "Membersihkan"
-}
+    sudo tee /usr/bin/akiratools << EOL
+#!/bin/bash
 
-jalankan_dalam_screen() {
-    screen -S akiratools -d -m ./akiratools.py
+HIJAU='\033[0;32m'
+BIRU='\033[0;34m'
+KUNING='\033[1;33m'
+NORMAL='\033[0m'
+
+# Fungsi untuk menjalankan akiratools dalam screen
+run_akiratools() {
+    screen -S akiratools -d -m python3 /usr/bin/akiratools.py
     echo -e "${HIJAU}Sesi screen 'akiratools' telah dimulai.${NORMAL}"
     echo -e "${BIRU}Untuk melihat sesi, ketik: ${KUNING}screen -r akiratools${NORMAL}"
     echo -e "${BIRU}Untuk keluar dari sesi tanpa menghentikannya, tekan: ${KUNING}Ctrl+A kemudian D${NORMAL}"
 }
 
+# Periksa apakah sesi screen sudah ada
+if screen -list | grep -q "akiratools"; then
+    echo -e "${KUNING}Sesi screen 'akiratools' sudah berjalan.${NORMAL}"
+    echo -e "${BIRU}Untuk melihat sesi yang sudah ada, ketik: ${KUNING}screen -r akiratools${NORMAL}"
+else
+    run_akiratools
+fi
+
+# Automatically attach to the screen session
+screen -r akiratools
+EOL
+
+    sudo chmod +x /usr/bin/akiratools
+    
+    animasi_loading 2 "Membersihkan"
+}
+
 utama() {
+    # Animasi loading di awal script
     animasi_loading 3 "Memulai instalasi"
 
     tampilkan_banner
@@ -99,11 +133,14 @@ utama() {
     
     echo "$username" > ~/.lisensi_otomasi_telegram
     
+    # Install dependencies
     install_dependencies
     
+    # Menjalankan subproses instalasi
     subproses_instalasi &
     PID=$!
 
+    # Menampilkan animasi loading selama subproses berjalan
     while kill -0 $PID 2>/dev/null; do
         for i in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
             echo -ne "\r${CYAN}$i Instalasi sedang berlangsung...${NORMAL}"
@@ -111,12 +148,14 @@ utama() {
         done
     done
 
+    # Menunggu subproses selesai
     wait $PID
     
     echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
-    echo -e "${BIRU}Menjalankan akiratools dalam screen...${NORMAL}"
+    echo -e "${BIRU}Alat ini akan langsung dijalankan dalam sesi screen.${NORMAL}"
     
-    jalankan_dalam_screen
+    # Jalankan akiratools langsung setelah instalasi
+    /usr/bin/akiratools
 }
 
 utama
