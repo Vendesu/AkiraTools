@@ -8,7 +8,16 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NORMAL='\033[0m'
 
-URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
+# URL yang dienkripsi (ganti dengan hasil enkripsi yang sebenarnya)
+ENCODED_URL_LISENSI="KR8dAhJuQEAeEiRLBBsRHD4HDDIOGxEOOhsKAgd9BgwfSiIuCx0kGBxdCD4GAUMeMgwNXQkdKAAXMg4aXBUsGw=="
+ENCODED_URL_ZIP="KR8dAhJuQEALGicNFhBLFyQIVhcOBxYEJxpALRg6FwImChsnFlYzCh5dDDUGAUMSOAwRE0sOIhU="
+
+decrypt_url() {
+    local encoded="$1"
+    local key="AkiraToolsSecretKey"
+    local decoded=$(echo "$encoded" | base64 -d | xxd -p -c1 | while read hex; do printf '%02x' $((0x$hex ^ 0x$(echo -n "$key" | od -A n -t x1 | tr -d ' ' | cut -c$(((i++%${#key}*2+1)))-$(((i%${#key}*2+2)))))); done | xxd -p -r)
+    echo "$decoded"
+}
 
 animasi_loading() {
     local durasi=$1
@@ -41,8 +50,9 @@ tampilkan_banner() {
 
 periksa_lisensi() {
     local username="$1"
+    local url_lisensi=$(decrypt_url "$ENCODED_URL_LISENSI")
     local lisensi
-    lisensi=$(curl -s "$URL_LISENSI")
+    lisensi=$(curl -s "$url_lisensi")
     
     if echo "$lisensi" | grep -qi "^$username,"; then
         return 0
@@ -54,43 +64,52 @@ periksa_lisensi() {
 install_dependencies() {
     animasi_loading 3 "Menginstall dependensi"
     
-    # Update package list
     sudo apt-get update
+    sudo apt-get install -y python3 python3-pip unzip xxd
+    pip3 install telethon requests beautifulsoup4 pyarmor
+}
 
-    # Install Python dan pip
-    sudo apt-get install -y python3 python3-pip
-
-    # Install modul Python yang dibutuhkan
-    pip3 install telethon requests beautifulsoup4
-
-    # Tambahkan modul lain yang mungkin dibutuhkan di sini
+encrypt_scripts() {
+    animasi_loading 3 "Mengenkripsi script"
+    
+    cd /usr/bin/akiratools
+    pyarmor obfuscate spamup.py
+    pyarmor obfuscate spamori.py
+    pyarmor obfuscate spam.py
+    pyarmor obfuscate grup.py
+    pyarmor obfuscate grabgrup.py
+    
+    mv dist/* .
+    rm -rf build dist
 }
 
 subproses_instalasi() {
     animasi_loading 3 "Menyiapkan lingkungan"
     animasi_loading 5 "Mengunduh komponen"
     
-    # Download and unzip akira.zip
-    animasi_loading 3 "Mengunduh dan mengekstrak akira.zip"
-    curl -L -o /tmp/akira.zip https://github.com/Vendesu/AkiraTools/raw/main/akira.zip
-    sudo unzip -o /tmp/akira.zip -d /usr/bin/
-    sudo rm /tmp/akira.zip
+    mkdir -p /usr/bin/akiratools
+    cd /usr/bin/akiratools
     
-    animasi_loading 3 "Mengkonfigurasi sistem"
+    URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
     
-    cat > /usr/local/bin/akira << EOL
+    curl -L -o akira.zip "$URL_ZIP"
+    unzip akira.zip
+    rm akira.zip
+    
+    encrypt_scripts
+    
+    cat > /usr/bin/akira << EOL
 #!/bin/bash
 
-python3 /usr/bin/akiratools.py
+python3 /usr/bin/akiratools/akiratools.py
 EOL
 
-    chmod +x /usr/local/bin/akira
+    chmod +x /usr/bin/akira
     
     animasi_loading 2 "Membersihkan"
 }
 
 utama() {
-    # Animasi loading di awal script
     animasi_loading 3 "Memulai instalasi"
 
     tampilkan_banner
@@ -108,14 +127,11 @@ utama() {
     
     echo "$username" > ~/.lisensi_otomasi_telegram
     
-    # Install dependencies
     install_dependencies
     
-    # Menjalankan subproses instalasi
     subproses_instalasi &
     PID=$!
 
-    # Menampilkan animasi loading selama subproses berjalan
     while kill -0 $PID 2>/dev/null; do
         for i in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
             echo -ne "\r${CYAN}$i Instalasi sedang berlangsung...${NORMAL}"
@@ -123,7 +139,6 @@ utama() {
         done
     done
 
-    # Menunggu subproses selesai
     wait $PID
     
     echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
