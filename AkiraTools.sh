@@ -57,8 +57,8 @@ install_dependencies() {
     # Update package list
     sudo apt-get update
 
-    # Install Python, pip, screen, and unzip
-    sudo apt-get install -y python3 python3-pip screen unzip
+    # Install Python dan pip
+    sudo apt-get install -y python3 python3-pip
 
     # Install modul Python yang dibutuhkan
     pip3 install telethon requests beautifulsoup4
@@ -78,42 +78,13 @@ subproses_instalasi() {
     
     animasi_loading 3 "Mengkonfigurasi sistem"
     
-    cat > /usr/local/bin/akiratools << EOL
+    cat > /usr/local/bin/akira << EOL
 #!/bin/bash
 
-HIJAU='\033[0;32m'
-KUNING='\033[1;33m'
-BIRU='\033[0;34m'
-NORMAL='\033[0m'
-
-# Fungsi untuk menjalankan akiratools dalam screen
-run_akiratools() {
-    # Periksa apakah sesi screen sudah ada
-    if ! screen -list | grep -q "akiratools"; then
-        # Jika tidak ada, buat sesi baru
-        screen -dmS akiratools python3 /usr/bin/akiratools.py
-        echo -e "${HIJAU}Sesi screen 'akiratools' telah dimulai.${NORMAL}"
-    else
-        echo -e "${KUNING}Sesi screen 'akiratools' sudah berjalan.${NORMAL}"
-    fi
-
-    echo -e "${BIRU}Untuk melihat sesi, ketik: ${KUNING}screen -r akiratools${NORMAL}"
-    echo -e "${BIRU}Untuk keluar dari sesi tanpa menghentikannya, tekan: ${KUNING}Ctrl+A kemudian D${NORMAL}"
-}
-
-# Jalankan fungsi
-run_akiratools
-
-# Tanya pengguna apakah ingin langsung masuk ke sesi screen
-read -p "Apakah Anda ingin masuk ke sesi screen sekarang? (y/n): " answer
-if [[ $answer == "y" || $answer == "Y" ]]; then
-    screen -r akiratools
-else
-    echo -e "${BIRU}Anda dapat masuk ke sesi nanti dengan mengetik: ${KUNING}screen -r akiratools${NORMAL}"
-fi
+python3 /usr/bin/akiratools.py
 EOL
 
-    chmod +x /usr/local/bin/akiratools
+    chmod +x /usr/local/bin/akira
     
     animasi_loading 2 "Membersihkan"
 }
@@ -156,8 +127,7 @@ utama() {
     wait $PID
     
     echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
-    echo -e "${BIRU}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${KUNING}akiratools${NORMAL}"
-    echo -e "${BIRU}Saat Anda menjalankan akiratools, sesi screen akan dibuat secara otomatis.${NORMAL}"
+    echo -e "${BIRU}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${KUNING}akira${NORMAL}"
 }
 
 utama
