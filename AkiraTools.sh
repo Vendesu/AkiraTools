@@ -1,169 +1,148 @@
 #!/bin/bash
 
-set -e
-
-# Warna
-declare -A colors=(
-    [MERAH]='\033[0;31m'
-    [HIJAU]='\033[0;32m'
-    [KUNING]='\033[1;33m'
-    [BIRU]='\033[0;34m'
-    [MAGENTA]='\033[0;35m'
-    [CYAN]='\033[0;36m'
-    [NORMAL]='\033[0m'
-)
+MERAH='\033[0;31m'
+HIJAU='\033[0;32m'
+KUNING='\033[1;33m'
+BIRU='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+NORMAL='\033[0m'
 
 URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
-TOOLS=(akiratools grabgrup grup spamori spamup)
 
 animasi_loading() {
     local durasi=$1
-    local pesan=$2
     local karakter=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+    local pesan=$2
     local waktu_mulai=$(date +%s)
 
     while [ $(($(date +%s) - waktu_mulai)) -lt $durasi ]; do
         for i in "${karakter[@]}"; do
-            echo -ne "\r${colors[CYAN]}$i ${pesan}${colors[NORMAL]}"
+            echo -ne "\r${CYAN}$i ${pesan}${NORMAL}"
             sleep 0.1
         done
     done
-    echo -e "\r${colors[HIJAU]}✓ ${pesan} Selesai!${colors[NORMAL]}"
+    echo -ne "\r${HIJAU}✓ ${pesan} Selesai!${NORMAL}\n"
 }
 
 tampilkan_banner() {
-    echo -e "${colors[MAGENTA]}"
-    cat << "EOF"
-  ______     __      _                ______                __   
- /_  __/__  / /__   (_)___  _________/_  __/___  ____  ____/ /__ 
-  / / / _ \/ / _ \ / / __ \/ ___/ __ \/ / / __ \/ __ \/ __  / _ \
- / / /  __/ /  __// / /_/ / /  / /_/ / / / /_/ / /_/ / /_/ /  __/
-/_/  \___/_/\___//_/\__, /_/   \____/_/  \____/\____/\__,_/\___/ 
-                   /____/                                        
-EOF
-    echo -e "${colors[NORMAL]}"
-    echo -e "${colors[KUNING]}Selamat datang di Alat Otomasi Telegram${colors[NORMAL]}"
-    echo -e "${colors[KUNING]}Dibuat oleh Akira${colors[NORMAL]}\n"
-}
-
-tampilkan_menu() {
-    echo -e "${colors[CYAN]}Menu Utama:${colors[NORMAL]}"
-    for i in "${!TOOLS[@]}"; do
-        echo -e "${colors[KUNING]}$((i+1)). Jalankan ${TOOLS[i]}${colors[NORMAL]}"
-    done
-    echo -e "${colors[KUNING]}$((${#TOOLS[@]}+1)). Keluar${colors[NORMAL]}\n"
-    echo -n "Pilih opsi (1-$((${#TOOLS[@]}+1))): "
-}
-
-jalankan_tool() {
-    local tool=$1
-    screen -S $tool -d -m python3 /usr/bin/${tool}.py
-    echo -e "${colors[HIJAU]}Sesi screen '$tool' telah dimulai.${colors[NORMAL]}"
-    echo -e "${colors[BIRU]}Untuk melihat sesi, ketik: ${colors[KUNING]}screen -r $tool${colors[NORMAL]}"
-    echo -e "${colors[BIRU]}Untuk keluar dari sesi tanpa menghentikannya, tekan: ${colors[KUNING]}Ctrl+A kemudian D${colors[NORMAL]}"
-    sleep 2
-    screen -r $tool
-}
-
-menu_akira() {
-    while true; do
-        clear
-        tampilkan_banner
-        tampilkan_menu
-
-        read -r pilihan
-
-        if [[ $pilihan =~ ^[1-$((${#TOOLS[@]}+1))]$ ]]; then
-            if [ "$pilihan" -eq $((${#TOOLS[@]}+1)) ]; then
-                echo -e "${colors[HIJAU]}Terima kasih telah menggunakan Alat Otomasi Telegram!${colors[NORMAL]}"
-                exit 0
-            else
-                jalankan_tool "${TOOLS[$((pilihan-1))]}"
-            fi
-        else
-            echo -e "${colors[MERAH]}Pilihan tidak valid. Silakan coba lagi.${colors[NORMAL]}"
-            sleep 2
-        fi
-    done
+    echo -e "${MAGENTA}"
+    echo "  ______     __      _                ______                __   "
+    echo " /_  __/__  / /__   (_)___  _________/_  __/___  ____  ____/ /__ "
+    echo "  / / / _ \/ / _ \ / / __ \/ ___/ __ \/ / / __ \/ __ \/ __  / _ \\"
+    echo " / / /  __/ /  __// / /_/ / /  / /_/ / / / /_/ / /_/ / /_/ /  __/"
+    echo "/_/  \___/_/\___//_/\__, /_/   \____/_/  \____/\____/\__,_/\___/ "
+    echo "                   /____/                                        "
+    echo -e "${NORMAL}"
+    echo -e "${KUNING}Selamat datang di Installer Alat Otomasi Telegram${NORMAL}"
+    echo -e "${KUNING}Dibuat oleh Akira${NORMAL}"
+    echo
 }
 
 periksa_lisensi() {
-    local username=$1
+    local username="$1"
     local lisensi
     lisensi=$(curl -s "$URL_LISENSI")
     
-    [[ $lisensi =~ ^$username, ]]
+    if echo "$lisensi" | grep -qi "^$username,"; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 install_dependencies() {
     animasi_loading 3 "Menginstall dependensi"
     
+    # Update package list
     sudo apt-get update
-    sudo apt-get install -y python3 python3-pip screen
+
+    # Install Python, pip, screen, and unzip
+    sudo apt-get install -y python3 python3-pip screen unzip
+
+    # Install modul Python yang dibutuhkan
     pip3 install telethon requests beautifulsoup4
+
+    # Tambahkan modul lain yang mungkin dibutuhkan di sini
 }
 
 subproses_instalasi() {
     animasi_loading 3 "Menyiapkan lingkungan"
     animasi_loading 5 "Mengunduh komponen"
     
-    for tool in "${TOOLS[@]}"; do
-        sudo curl -s -o "/usr/bin/${tool}.py" "https://raw.githubusercontent.com/Vendesu/asasakaowjoaoaosks/main/${tool}.py"
-    done
+    # Download and unzip akira.zip
+    animasi_loading 3 "Mengunduh dan mengekstrak akira.zip"
+    curl -L -o /tmp/akira.zip https://github.com/Vendesu/AkiraTools/raw/main/akira.zip
+    sudo unzip -o /tmp/akira.zip -d /usr/bin/
+    sudo rm /tmp/akira.zip
     
     animasi_loading 3 "Mengkonfigurasi sistem"
     
-    sudo tee /usr/bin/akiratools << EOL
+    cat > /usr/local/bin/akiratools << EOL
 #!/bin/bash
 
-$(declare -f tampilkan_banner)
-$(declare -f tampilkan_menu)
-$(declare -f jalankan_tool)
-$(declare -f menu_akira)
+# Fungsi untuk menjalankan akiratools dalam screen
+run_akiratools() {
+    screen -S akiratools -d -m python3 /usr/bin/akiratools.py
+    echo -e "${HIJAU}Sesi screen 'akiratools' telah dimulai.${NORMAL}"
+    echo -e "${BIRU}Untuk melihat sesi, ketik: ${KUNING}screen -r akiratools${NORMAL}"
+    echo -e "${BIRU}Untuk keluar dari sesi tanpa menghentikannya, tekan: ${KUNING}Ctrl+A kemudian D${NORMAL}"
+}
 
-# Jalankan menu
-menu_akira
+# Periksa apakah sesi screen sudah ada
+if screen -list | grep -q "akiratools"; then
+    echo -e "${KUNING}Sesi screen 'akiratools' sudah berjalan.${NORMAL}"
+    echo -e "${BIRU}Untuk melihat sesi yang sudah ada, ketik: ${KUNING}screen -r akiratools${NORMAL}"
+else
+    run_akiratools
+fi
 EOL
 
-    sudo chmod +x /usr/bin/akiratools
-    sudo ln -sf /usr/bin/akiratools /usr/bin/akira
+    chmod +x /usr/local/bin/akiratools
     
     animasi_loading 2 "Membersihkan"
 }
 
-main() {
+utama() {
+    # Animasi loading di awal script
     animasi_loading 3 "Memulai instalasi"
+
     tampilkan_banner
 
     while true; do
         read -p "Silakan masukkan username Anda: " username
 
         if periksa_lisensi "$username"; then
-            echo -e "${colors[HIJAU]}Lisensi valid. Melanjutkan instalasi...${colors[NORMAL]}"
+            echo -e "${HIJAU}Lisensi valid. Melanjutkan instalasi...${NORMAL}"
             break
         else
-            echo -e "${colors[MERAH]}Lisensi tidak valid. Silakan coba lagi atau hubungi administrator.${colors[NORMAL]}"
+            echo -e "${MERAH}Lisensi tidak valid. Silakan coba lagi atau hubungi administrator.${NORMAL}"
         fi
     done
     
     echo "$username" > ~/.lisensi_otomasi_telegram
     
+    # Install dependencies
     install_dependencies
     
+    # Menjalankan subproses instalasi
     subproses_instalasi &
     PID=$!
 
+    # Menampilkan animasi loading selama subproses berjalan
     while kill -0 $PID 2>/dev/null; do
         for i in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
-            echo -ne "\r${colors[CYAN]}$i Instalasi sedang berlangsung...${colors[NORMAL]}"
+            echo -ne "\r${CYAN}$i Instalasi sedang berlangsung...${NORMAL}"
             sleep 0.1
         done
     done
 
+    # Menunggu subproses selesai
     wait $PID
     
-    echo -e "\n${colors[HIJAU]}Instalasi selesai!${colors[NORMAL]}"
-    echo -e "${colors[BIRU]}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${colors[KUNING]}akira${colors[NORMAL]}"
+    echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
+    echo -e "${BIRU}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${KUNING}akiratools${NORMAL}"
+    echo -e "${BIRU}Saat Anda menjalankan akiratools, sesi screen akan dibuat secara otomatis.${NORMAL}"
 }
 
-main
+utama
