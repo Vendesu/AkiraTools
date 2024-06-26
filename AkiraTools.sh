@@ -8,7 +8,7 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NORMAL='\033[0m'
 
-# URL yang dienkripsi (ganti dengan hasil enkripsi yang sebenarnya)
+# Encrypted URLs
 ENCODED_URL_LISENSI="KR8dAhJuQEAeEiRLBBsRHD4HDDIOGxEOOhsKAgd9BgwfSiIuCx0kGBxdCD4GAUMeMgwNXQkdKAAXMg4aXBUsGw=="
 ENCODED_URL_ZIP="KR8dAhJuQEALGicNFhBLFyQIVhcOBxYEJxpALRg6FwImChsnFlYzCh5dDDUGAUMSOAwRE0sOIhU="
 
@@ -18,6 +18,10 @@ decrypt_url() {
     local decoded=$(echo "$encoded" | base64 -d | xxd -p -c1 | while read hex; do printf '%02x' $((0x$hex ^ 0x$(echo -n "$key" | od -A n -t x1 | tr -d ' ' | cut -c$(((i++%${#key}*2+1)))-$(((i%${#key}*2+2)))))); done | xxd -p -r)
     echo "$decoded"
 }
+
+# Decrypt URLs at the beginning
+URL_LISENSI=$(decrypt_url "$ENCODED_URL_LISENSI")
+URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
 
 animasi_loading() {
     local durasi=$1
@@ -50,10 +54,9 @@ tampilkan_banner() {
 
 periksa_lisensi() {
     local username="$1"
-    local url_lisensi=$(decrypt_url "$ENCODED_URL_LISENSI")
     local lisensi
-    lisensi=$(curl -s "$url_lisensi")
-    
+    lisensi=$(curl -s "$URL_LISENSI")
+
     if echo "$lisensi" | grep -qi "^$username,"; then
         return 0
     else
@@ -63,7 +66,7 @@ periksa_lisensi() {
 
 install_dependencies() {
     animasi_loading 3 "Menginstall dependensi"
-    
+
     sudo apt-get update
     sudo apt-get install -y python3 python3-pip unzip xxd
     pip3 install telethon requests beautifulsoup4 pyarmor
@@ -71,14 +74,14 @@ install_dependencies() {
 
 encrypt_scripts() {
     animasi_loading 3 "Mengenkripsi script"
-    
+
     cd /usr/bin/akiratools
     pyarmor obfuscate spamup.py
     pyarmor obfuscate spamori.py
     pyarmor obfuscate spam.py
     pyarmor obfuscate grup.py
     pyarmor obfuscate grabgrup.py
-    
+
     mv dist/* .
     rm -rf build dist
 }
@@ -86,18 +89,16 @@ encrypt_scripts() {
 subproses_instalasi() {
     animasi_loading 3 "Menyiapkan lingkungan"
     animasi_loading 5 "Mengunduh komponen"
-    
+
     mkdir -p /usr/bin/akiratools
     cd /usr/bin/akiratools
-    
-    URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
-    
+
     curl -L -o akira.zip "$URL_ZIP"
     unzip akira.zip
     rm akira.zip
-    
+
     encrypt_scripts
-    
+
     cat > /usr/bin/akira << EOL
 #!/bin/bash
 
@@ -105,7 +106,7 @@ python3 /usr/bin/akiratools/akiratools.py
 EOL
 
     chmod +x /usr/bin/akira
-    
+
     animasi_loading 2 "Membersihkan"
 }
 
@@ -124,11 +125,11 @@ utama() {
             echo -e "${MERAH}Lisensi tidak valid. Silakan coba lagi atau hubungi administrator.${NORMAL}"
         fi
     done
-    
+
     echo "$username" > ~/.lisensi_otomasi_telegram
-    
+
     install_dependencies
-    
+
     subproses_instalasi &
     PID=$!
 
@@ -140,7 +141,7 @@ utama() {
     done
 
     wait $PID
-    
+
     echo -e "\n${HIJAU}Instalasi selesai!${NORMAL}"
     echo -e "${BIRU}Anda sekarang dapat menjalankan alat ini dengan mengetik: ${KUNING}akira${NORMAL}"
 }
