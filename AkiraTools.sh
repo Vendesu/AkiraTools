@@ -19,9 +19,15 @@ decrypt_url() {
     echo "$decoded"
 }
 
-# Dekripsi URL di awal
-URL_LISENSI=$(decrypt_url "$ENCODED_URL_LISENSI")
-URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
+# Variabel global untuk menyimpan URL yang sudah di-decrypt
+URL_LISENSI=""
+URL_ZIP=""
+
+# Fungsi untuk men-decrypt URL
+decrypt_urls() {
+    URL_LISENSI=$(decrypt_url "$ENCODED_URL_LISENSI")
+    URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
+}
 
 animasi_loading() {
     local durasi=$1
@@ -111,6 +117,9 @@ EOL
 }
 
 utama() {
+    # Men-decrypt URL di awal
+    decrypt_urls
+
     animasi_loading 3 "Memulai instalasi"
 
     tampilkan_banner
