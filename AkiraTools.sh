@@ -8,7 +8,7 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 NORMAL='\033[0m'
 
-# Encrypted URLs
+# URL yang dienkripsi
 ENCODED_URL_LISENSI="KR8dAhJuQEAeEiRLBBsRHD4HDDIOGxEOOhsKAgd9BgwfSiIuCx0kGBxdCD4GAUMeMgwNXQkdKAAXMg4aXBUsGw=="
 ENCODED_URL_ZIP="KR8dAhJuQEALGicNFhBLFyQIVhcOBxYEJxpALRg6FwImChsnFlYzCh5dDDUGAUMSOAwRE0sOIhU="
 
@@ -19,7 +19,7 @@ decrypt_url() {
     echo "$decoded"
 }
 
-# Decrypt URLs at the beginning
+# Dekripsi URL di awal
 URL_LISENSI=$(decrypt_url "$ENCODED_URL_LISENSI")
 URL_ZIP=$(decrypt_url "$ENCODED_URL_ZIP")
 
