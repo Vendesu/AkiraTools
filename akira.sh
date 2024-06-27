@@ -23,7 +23,7 @@ print_header() {
 download_and_extract() {
     echo -e "${YELLOW}Mengunduh file...${NC}"
     wget https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O akiraa.zip
-    
+
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}Unduhan berhasil.${NC}"
         echo -e "${YELLOW}Mengekstrak file...${NC}"
@@ -33,6 +33,25 @@ download_and_extract() {
             echo -e "${YELLOW}Memberikan akses penuh ke semua file...${NC}"
             chmod -R 777 *
             echo -e "${GREEN}Akses diberikan.${NC}"
+            
+            # Memberikan izin eksekusi ke file-file Python
+            chmod +x login.py
+            chmod +x auto_join.py
+            chmod +x auto_send_grup.py
+            chmod +x auto_send_user.py
+            chmod +x schedule_message.py
+            chmod +x filter_members.py
+            chmod +x export_data.py
+            chmod +x group_stats.py
+            chmod +x spam_detector.py
+            chmod +x backup_chat.py
+            chmod +x auto_reply.py
+            chmod +x download_media.py
+            chmod +x message_translator.py
+            chmod +x keyword_monitor.py
+            chmod +x clean_group.py
+            
+            echo -e "${GREEN}Izin eksekusi diberikan ke semua file Python.${NC}"
             rm akiraa.zip
         else
             echo -e "${RED}Gagal mengekstrak file.${NC}"
@@ -68,17 +87,17 @@ install_dependencies() {
 main() {
     clear_screen
     print_header
-    
+
     # Periksa apakah wget, unzip, dan pip tersedia
     if ! command -v wget &> /dev/null || ! command -v unzip &> /dev/null || ! command -v pip &> /dev/null; then
         echo -e "${RED}Error: wget, unzip, atau pip tidak tersedia. Silakan instal terlebih dahulu.${NC}"
         exit 1
     fi
-    
+
     download_and_extract
     setup_license
     install_dependencies
-    
+
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Anda sekarang dapat menjalankan script main.py untuk memulai Telegram Automation Tool.${NC}"
 }
