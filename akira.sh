@@ -30,6 +30,9 @@ download_and_extract() {
         unzip -o akiraa.zip
         if [ $? -eq 0 ]; then
             echo -e "${GREEN}Ekstraksi berhasil.${NC}"
+            echo -e "${YELLOW}Memberikan akses penuh ke semua file...${NC}"
+            chmod -R 777 *
+            echo -e "${GREEN}Akses diberikan.${NC}"
             rm akiraa.zip
         else
             echo -e "${RED}Gagal mengekstrak file.${NC}"
