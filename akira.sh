@@ -1,187 +1,79 @@
 #!/bin/bash
 
-# Warna
-MERAH='\033[0;31m'
-HIJAU='\033[0;32m'
-KUNING='\033[1;33m'
-BIRU='\033[0;34m'
-UNGU='\033[0;35m'
-CYAN='\033[0;36m'
-PUTIH='\033[1;37m'
-RESET='\033[0m'
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-# URL Lisensi dan GitHub
-URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
-URL_AKIRATOOLS="https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip"
-
-# Folder Akira Tools
-AKIRA_DIR="/usr/bin"
-
-# File Lisensi
-LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
-
-# Animasi keren
-animasi_keren() {
-    clear
-    echo -e "${CYAN}"
-    for i in {1..20}; do
-        printf "\r%${i}s" | tr " " "="
-        sleep 0.05
-    done
-    echo -e "${RESET}"
+# Function to display a styled header
+print_header() {
+    echo -e "${YELLOW}╔══════════════════════════════════════════════════════════╗"
+    echo -e "║              AKIRATOOLS AUTO INSTALLER                ║"
+    echo -e "╚══════════════════════════════════════════════════════════╝${NC}"
 }
 
-# Fungsi untuk mencetak banner keren dengan animasi
-cetak_banner_animasi() {
-    clear
-    local banner=(
-    "${CYAN}╔════════════════════════════════════════════════════════════╗"
-    "║                                                            ║"
-    "║                 AKIRA TOOLS INSTALLER                      ║"
-    "║                Buat Hidupmu Lebih Mudah!                   ║"
-    "╚════════════════════════════════════════════════════════════╝${RESET}"
-    )
-    for line in "${banner[@]}"; do
-        echo -n "$line"
-        sleep 0.1
-        echo -e "\r"
-    done
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
 }
 
-# Fungsi untuk animasi loading
-animasi_loading() {
-    local duration=$1
-    local chars="◐◓◑◒"
-    local start=$(date +%s)
-    local end=$((start + duration))
-    
-    while [ $(date +%s) -lt $end ]; do
-        for (( i=0; i<${#chars}; i++ )); do
-            echo -en "${CYAN}${chars:$i:1}" $'\r'
-            sleep 0.2
-        done
-    done
-    echo -en "${RESET}"
-}
-
-# Fungsi untuk animasi teks ketik
-animasi_ketik() {
-    local teks="$1"
-    local warna="$2"
-    for (( i=0; i<${#teks}; i++ )); do
-        echo -en "${warna}${teks:$i:1}"
-        sleep 0.02
-    done
-    echo -e "${RESET}"
-}
-
-# Fungsi untuk memeriksa lisensi
-periksa_lisensi() {
-    local nama="$1"
-    if curl -s "$URL_LISENSI" | grep -q "$nama"; then
-        local durasi=$(curl -s "$URL_LISENSI" | grep "$nama" | cut -d',' -f2)
-        if [ "$durasi" == "lifetime" ]; then
-            echo "lifetime"
-        else
-            echo "$durasi"
-        fi
+# Function to install required packages
+install_requirements() {
+    echo -e "${GREEN}Installing required packages...${NC}"
+    if command_exists apt-get; then
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip unzip curl
+    elif command_exists yum; then
+        sudo yum update
+        sudo yum install -y python3 python3-pip unzip curl
     else
-        echo "tidak valid"
+        echo -e "${RED}Unsupported package manager. Please install Python 3, pip, unzip, and curl manually.${NC}"
+        exit 1
     fi
 }
 
-# Fungsi untuk menampilkan progress bar
-tampilkan_progress() {
-    local durasi=$1
-    local pesan=$2
-    local lebar=40
-    local karakter_progress="▓"
-    local karakter_kosong="░"
-    
-    for ((i=0; i<=lebar; i++)); do
-        local persentase=$((i * 100 / lebar))
-        local progress=$(printf "%${i}s" | tr ' ' "$karakter_progress")
-        local sisa=$(printf "%$((lebar - i))s" | tr ' ' "$karakter_kosong")
-        printf "\r${CYAN}%s [%s%s] %d%%" "$pesan" "$progress" "$sisa" "$persentase"
-        sleep $(echo "scale=2; $durasi / $lebar" | bc)
-    done
-    echo -e "${RESET}"
-}
+# Main installation process
+main() {
+    print_header
 
-# Fungsi instalasi utama
-instal_otomasi_telegram() {
-    animasi_keren
-    cetak_banner_animasi
-    animasi_ketik "Yo! Selamat datang di Akira Tools Installer!" "${KUNING}"
-    sleep 1
+    # Install requirements
+    install_requirements
 
-    echo -e "\n${UNGU}Oke, pertama-tama, kita perlu cek lisensimu nih:${RESET}"
-    read -p "$(echo -e ${PUTIH}Coba ketik namamu disini: ${RESET})" nama_lisensi
+    # Download license file
+    echo -e "${GREEN}Downloading license file...${NC}"
+    curl -s https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt -o licenses.txt
 
-    animasi_ketik "Bentar ya, aku cek dulu..." "${KUNING}"
-    animasi_loading 2
-    status_lisensi=$(periksa_lisensi "$nama_lisensi")
+    # Prompt for license key
+    echo -e "${YELLOW}Please enter your license key:${NC}"
+    read license_key
 
-    if [ "$status_lisensi" == "tidak valid" ]; then
-        animasi_ketik "Waduh, lisensimu nggak valid nih. Instalasi gak bisa dilanjut, sorry ya!" "${MERAH}"
+    # Verify license
+    if grep -q "$license_key" licenses.txt; then
+        echo -e "${GREEN}License valid. Proceeding with installation...${NC}"
+    else
+        echo -e "${RED}Invalid license. Exiting installation.${NC}"
         exit 1
     fi
 
-    animasi_ketik "Mantap! Lisensimu valid. Durasinya: $status_lisensi" "${HIJAU}"
-    echo "$nama_lisensi" > "$LICENSE_FILE"
+    # Download AkiraTools
+    echo -e "${GREEN}Downloading AkiraTools...${NC}"
+    curl -L https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -o akiraa.zip
 
-    echo
-    animasi_ketik "Oke, kita mulai instalasi ya! Siap-siap..." "${KUNING}"
-    sleep 1
+    # Unzip AkiraTools
+    echo -e "${GREEN}Extracting AkiraTools...${NC}"
+    unzip -q akiraa.zip -d akiratools
 
-    echo -e "\n${CYAN}[1/4]${RESET} Ngecek dan masang yang dibutuhin..."
-    tampilkan_progress 5 "Lagi masang dependencies"
-    sudo apt update > /dev/null 2>&1
-    sudo apt install -y python3 python3-pip unzip > /dev/null 2>&1
-    animasi_ketik "Sip, udah keinstall semua!" "${HIJAU}"
+    # Install Python requirements
+    echo -e "${GREEN}Installing Python requirements...${NC}"
+    pip3 install -r akiratools/requirements.txt
 
-    echo -e "\n${CYAN}[2/4]${RESET} Sekarang kita pasang paket Python-nya..."
-    tampilkan_progress 3 "Masang paket Python"
-    sudo pip3 install telethon requests > /dev/null 2>&1
-    animasi_ketik "Mantap, paket Python udah siap!" "${HIJAU}"
+    # Save license key
+    echo "$license_key" > ~/.lisensi_otomasi_telegram
 
-    echo -e "\n${CYAN}[3/4]${RESET} Lagi download file-file penting nih..."
-    tampilkan_progress 4 "Download file"
-
-    # Download dan ekstrak file zip
-    sudo wget -q "$URL_AKIRATOOLS" -O "$AKIRA_DIR/akiraa.zip"
-    sudo unzip -q "$AKIRA_DIR/akiraa.zip" -d "$AKIRA_DIR"
-    sudo rm "$AKIRA_DIR/akiraa.zip"
-
-    animasi_ketik "Oke, semua file udah kedownload dan diekstrak!" "${HIJAU}"
-
-    echo -e "\n${CYAN}[4/4]${RESET} Tinggal setting dikit..."
-    tampilkan_progress 2 "Setting file"
-    sudo chmod 755 "$AKIRA_DIR"/*.py
-    animasi_ketik "Nah, udah beres!" "${HIJAU}"
-
-    # Buat alias untuk menjalankan script
-    echo "alias akiratools='akiratools.py'" >> "$HOME/.bashrc"
-    source "$HOME/.bashrc"
-
-    echo
-    animasi_ketik "Instalasi selesai! Gampang kan?" "${HIJAU}"
-    sleep 1
-
-    animasi_keren
-    cetak_banner_animasi
-    animasi_ketik "Selamat! Akira Tools udah siap dipakai!" "${HIJAU}"
-    echo -e "\n${KUNING}Aku akan menjalankan Akira Tools secara otomatis dalam 5 detik...${RESET}"
-    
-    for i in {5..1}; do
-        echo -en "${CYAN}$i... ${RESET}"
-        sleep 1
-    done
-    echo
-
-    animasi_ketik "Menjalankan Akira Tools..." "${HIJAU}"
-    akiratools.py
+    echo -e "${GREEN}Installation complete!${NC}"
+    echo -e "${YELLOW}You can now run AkiraTools by executing: python3 akiratools/akiratools.py${NC}"
 }
 
-# Jalankan instalasi
-instal_otomasi_telegram
+# Run the main function
+main
