@@ -13,9 +13,9 @@ RESET='\033[0m'
 # URL Lisensi dan Pastebin
 URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
 URL_AKIRATOOLS="https://pastebin.com/raw/JpFB6V57"
-URL_GRUP="https://pastebin.com/raw/Dp62gsCu"
-URL_SPAMUP="https://pastebin.com/raw/PSVgLDvB"
-URL_SPAMORI="https://pastebin.com/raw/PYdhxtS3"
+URL_AUTO_JOIN="https://pastebin.com/raw/Dp62gsCu"
+URL_AUTO_SEND_GRUP="https://pastebin.com/raw/PSVgLDvB"
+URL_AUTO_SEND_USER="https://pastebin.com/raw/PYdhxtS3"
 
 # Folder Akira Tools
 AKIRA_DIR="$HOME/.akira_tools"
