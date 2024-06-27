@@ -6,6 +6,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# License URL
+LICENSE_URL="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
+
 # Function to display a styled header
 print_header() {
     echo -e "${YELLOW}╔══════════════════════════════════════════════════════════╗"
@@ -40,6 +43,16 @@ install_python_modules() {
     pip3 install requests telethon colorama asyncio
 }
 
+# Function to verify license
+verify_license() {
+    local license_key="$1"
+    if curl -s "$LICENSE_URL" | grep -q "$license_key"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Main installation process
 main() {
     print_header
@@ -50,16 +63,12 @@ main() {
     # Install Python modules
     install_python_modules
 
-    # Download license file
-    echo -e "${GREEN}Downloading license file...${NC}"
-    curl -s https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt -o licenses.txt
-
     # Prompt for license key
     echo -e "${YELLOW}Please enter your license key:${NC}"
     read license_key
 
     # Verify license
-    if grep -q "$license_key" licenses.txt; then
+    if verify_license "$license_key"; then
         echo -e "${GREEN}License valid. Proceeding with installation...${NC}"
     else
         echo -e "${RED}Invalid license. Exiting installation.${NC}"
