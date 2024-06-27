@@ -33,12 +33,22 @@ install_requirements() {
     fi
 }
 
+# Function to install Python modules
+install_python_modules() {
+    echo -e "${GREEN}Installing required Python modules...${NC}"
+    pip3 install --upgrade pip
+    pip3 install requests telethon colorama asyncio
+}
+
 # Main installation process
 main() {
     print_header
 
     # Install requirements
     install_requirements
+
+    # Install Python modules
+    install_python_modules
 
     # Download license file
     echo -e "${GREEN}Downloading license file...${NC}"
@@ -63,10 +73,6 @@ main() {
     # Unzip AkiraTools
     echo -e "${GREEN}Extracting AkiraTools...${NC}"
     unzip -q akiraa.zip -d akiratools
-
-    # Install Python requirements
-    echo -e "${GREEN}Installing Python requirements...${NC}"
-    pip3 install -r akiratools/requirements.txt
 
     # Save license key
     echo "$license_key" > ~/.lisensi_otomasi_telegram
