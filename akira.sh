@@ -139,7 +139,7 @@ instal_otomasi_telegram() {
 
     echo -e "\n${CYAN}[2/4]${RESET} Sekarang kita pasang paket Python-nya..."
     tampilkan_progress 3 "Masang paket Python"
-    pip3 install telethon requests > /dev/null 2>&1
+    pip3 install telethon requests colorama > /dev/null 2>&1
     animasi_ketik "Mantap, paket Python udah siap!" "${HIJAU}"
 
     echo -e "\n${CYAN}[3/4]${RESET} Lagi download file-file penting nih..."
