@@ -15,7 +15,10 @@ URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
 URL_AKIRATOOLS="https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip"
 
 # Folder Akira Tools
-AKIRA_DIR="$HOME/.akira_tools"
+AKIRA_DIR="/usr/bin"
+
+# File Lisensi
+LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 
 # Animasi keren
 animasi_keren() {
@@ -125,7 +128,7 @@ instal_otomasi_telegram() {
     fi
 
     animasi_ketik "Mantap! Lisensimu valid. Durasinya: $status_lisensi" "${HIJAU}"
-    echo "$nama_lisensi" > ~/.lisensi_otomasi_telegram
+    echo "$nama_lisensi" > "$LICENSE_FILE"
 
     echo
     animasi_ketik "Oke, kita mulai instalasi ya! Siap-siap..." "${KUNING}"
@@ -139,29 +142,26 @@ instal_otomasi_telegram() {
 
     echo -e "\n${CYAN}[2/4]${RESET} Sekarang kita pasang paket Python-nya..."
     tampilkan_progress 3 "Masang paket Python"
-    pip3 install telethon requests colorama > /dev/null 2>&1
+    sudo pip3 install telethon requests > /dev/null 2>&1
     animasi_ketik "Mantap, paket Python udah siap!" "${HIJAU}"
 
     echo -e "\n${CYAN}[3/4]${RESET} Lagi download file-file penting nih..."
     tampilkan_progress 4 "Download file"
 
-    # Buat folder tersembunyi di home directory
-    mkdir -p "$AKIRA_DIR"
-
     # Download dan ekstrak file zip
-    wget -q "$URL_AKIRATOOLS" -O "$AKIRA_DIR/akiraa.zip"
-    unzip -q "$AKIRA_DIR/akiraa.zip" -d "$AKIRA_DIR"
-    rm "$AKIRA_DIR/akiraa.zip"
+    sudo wget -q "$URL_AKIRATOOLS" -O "$AKIRA_DIR/akiraa.zip"
+    sudo unzip -q "$AKIRA_DIR/akiraa.zip" -d "$AKIRA_DIR"
+    sudo rm "$AKIRA_DIR/akiraa.zip"
 
     animasi_ketik "Oke, semua file udah kedownload dan diekstrak!" "${HIJAU}"
 
     echo -e "\n${CYAN}[4/4]${RESET} Tinggal setting dikit..."
     tampilkan_progress 2 "Setting file"
-    chmod 700 "$AKIRA_DIR"/*.py
+    sudo chmod 755 "$AKIRA_DIR"/*.py
     animasi_ketik "Nah, udah beres!" "${HIJAU}"
 
     # Buat alias untuk menjalankan script
-    echo "alias akiratools='python3 $AKIRA_DIR/akiratools.py'" >> "$HOME/.bashrc"
+    echo "alias akiratools='akiratools.py'" >> "$HOME/.bashrc"
     source "$HOME/.bashrc"
 
     echo
@@ -180,7 +180,7 @@ instal_otomasi_telegram() {
     echo
 
     animasi_ketik "Menjalankan Akira Tools..." "${HIJAU}"
-    python3 "$AKIRA_DIR/akiratools.py"
+    akiratools.py
 }
 
 # Jalankan instalasi
