@@ -10,12 +10,9 @@ CYAN='\033[0;36m'
 PUTIH='\033[1;37m'
 RESET='\033[0m'
 
-# URL Lisensi dan Pastebin
+# URL Lisensi dan GitHub
 URL_LISENSI="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
-URL_AKIRATOOLS="https://pastebin.com/raw/JpFB6V57"
-URL_AUTO_JOIN="https://pastebin.com/raw/Dp62gsCu"
-URL_AUTO_SEND_GRUP="https://pastebin.com/raw/PSVgLDvB"
-URL_AUTO_SEND_USER="https://pastebin.com/raw/PYdhxtS3"
+URL_AKIRATOOLS="https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip"
 
 # Folder Akira Tools
 AKIRA_DIR="$HOME/.akira_tools"
@@ -137,7 +134,7 @@ instal_otomasi_telegram() {
     echo -e "\n${CYAN}[1/4]${RESET} Ngecek dan masang yang dibutuhin..."
     tampilkan_progress 5 "Lagi masang dependencies"
     sudo apt update > /dev/null 2>&1
-    sudo apt install -y python3 python3-pip > /dev/null 2>&1
+    sudo apt install -y python3 python3-pip unzip > /dev/null 2>&1
     animasi_ketik "Sip, udah keinstall semua!" "${HIJAU}"
 
     echo -e "\n${CYAN}[2/4]${RESET} Sekarang kita pasang paket Python-nya..."
@@ -151,12 +148,12 @@ instal_otomasi_telegram() {
     # Buat folder tersembunyi di home directory
     mkdir -p "$AKIRA_DIR"
 
-    # Download file ke folder tersembunyi
-    wget -q "$URL_AKIRATOOLS" -O "$AKIRA_DIR/akiratools.py"
-    wget -q "$URL_GRUP" -O "$AKIRA_DIR/grup.py"
-    wget -q "$URL_SPAMUP" -O "$AKIRA_DIR/spamup.py"
-    wget -q "$URL_SPAMORI" -O "$AKIRA_DIR/spamori.py"
-    animasi_ketik "Oke, semua file udah kedownload!" "${HIJAU}"
+    # Download dan ekstrak file zip
+    wget -q "$URL_AKIRATOOLS" -O "$AKIRA_DIR/akiraa.zip"
+    unzip -q "$AKIRA_DIR/akiraa.zip" -d "$AKIRA_DIR"
+    rm "$AKIRA_DIR/akiraa.zip"
+
+    animasi_ketik "Oke, semua file udah kedownload dan diekstrak!" "${HIJAU}"
 
     echo -e "\n${CYAN}[4/4]${RESET} Tinggal setting dikit..."
     tampilkan_progress 2 "Setting file"
