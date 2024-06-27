@@ -6,8 +6,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# License URL
+# License URL and File
 LICENSE_URL="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
+LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 
 # Function to display a styled header
 print_header() {
@@ -53,6 +54,15 @@ verify_license() {
     fi
 }
 
+# Function to get saved license
+get_saved_license() {
+    if [ -f "$LICENSE_FILE" ]; then
+        cat "$LICENSE_FILE"
+    else
+        echo ""
+    fi
+}
+
 # Main installation process
 main() {
     print_header
@@ -63,16 +73,32 @@ main() {
     # Install Python modules
     install_python_modules
 
-    # Prompt for license key
-    echo -e "${YELLOW}Please enter your license key:${NC}"
-    read license_key
+    # Check for existing license
+    saved_license=$(get_saved_license)
+    if [ -n "$saved_license" ]; then
+        echo -e "${YELLOW}Existing license found. Verifying...${NC}"
+        if verify_license "$saved_license"; then
+            echo -e "${GREEN}Existing license is valid. Proceeding with installation...${NC}"
+            license_key="$saved_license"
+        else
+            echo -e "${RED}Existing license is invalid. Please enter a new license.${NC}"
+            saved_license=""
+        fi
+    fi
 
-    # Verify license
-    if verify_license "$license_key"; then
-        echo -e "${GREEN}License valid. Proceeding with installation...${NC}"
-    else
-        echo -e "${RED}Invalid license. Exiting installation.${NC}"
-        exit 1
+    # Prompt for license key if not already verified
+    if [ -z "$saved_license" ]; then
+        echo -e "${YELLOW}Please enter your license key:${NC}"
+        read license_key
+
+        # Verify license
+        if verify_license "$license_key"; then
+            echo -e "${GREEN}License valid. Proceeding with installation...${NC}"
+            echo "$license_key" > "$LICENSE_FILE"
+        else
+            echo -e "${RED}Invalid license. Exiting installation.${NC}"
+            exit 1
+        fi
     fi
 
     # Download AkiraTools
@@ -82,9 +108,6 @@ main() {
     # Unzip AkiraTools
     echo -e "${GREEN}Extracting AkiraTools...${NC}"
     unzip -q akiraa.zip -d akiratools
-
-    # Save license key
-    echo "$license_key" > ~/.lisensi_otomasi_telegram
 
     echo -e "${GREEN}Installation complete!${NC}"
     echo -e "${YELLOW}You can now run AkiraTools by executing: python3 akiratools/akiratools.py${NC}"
