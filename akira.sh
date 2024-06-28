@@ -10,6 +10,9 @@ NC='\033[0m' # No Color
 # Nama folder tersembunyi
 HIDDEN_FOLDER="$HOME/.akira_tools"
 
+# URL lisensi
+LICENSE_URL="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
+
 # Fungsi untuk animasi loading
 show_loading() {
     local pid=$1
@@ -53,12 +56,35 @@ setup_environment() {
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
 }
 
+# Fungsi untuk validasi lisensi
+validate_license() {
+    local name="$1"
+    echo -e "${YELLOW}Memvalidasi lisensi...${NC}"
+    
+    # Mengunduh file lisensi
+    local licenses=$(wget -qO- "$LICENSE_URL")
+    
+    if [[ $licenses == *"$name"* ]]; then
+        echo -e "${GREEN}Lisensi valid.${NC}"
+        return 0
+    else
+        echo -e "${RED}Lisensi tidak valid.${NC}"
+        return 1
+    fi
+}
+
 # Fungsi untuk menyiapkan lisensi
 setup_license() {
     echo -e "${YELLOW}Menyiapkan lisensi...${NC}"
     read -p "Masukkan nama Anda: " name
-    echo "$name" > "$HIDDEN_FOLDER/.lisensi_otomasi_telegram"
-    echo -e "${GREEN}Lisensi berhasil disiapkan.${NC}"
+    
+    if validate_license "$name"; then
+        echo "$name" > "$HIDDEN_FOLDER/.lisensi_otomasi_telegram"
+        echo -e "${GREEN}Lisensi berhasil disiapkan.${NC}"
+    else
+        echo -e "${RED}Gagal menyiapkan lisensi. Instalasi dibatalkan.${NC}"
+        exit 1
+    fi
 }
 
 # Fungsi untuk menginstal dependensi
