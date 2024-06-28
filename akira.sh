@@ -90,6 +90,17 @@ create_alias() {
     echo -e "${GREEN}Perintah 'akira' berhasil disiapkan.${NC}"
 }
 
+# Fungsi untuk membuat skrip akira
+create_akira_script() {
+    echo -e "${YELLOW}Membuat skrip akira...${NC}"
+    cat > /usr/local/bin/akira << EOL
+#!/bin/bash
+python3 $HOME/$HIDDEN_FOLDER/akiratools.py
+EOL
+    chmod +x /usr/local/bin/akira
+    echo -e "${GREEN}Skrip akira berhasil dibuat.${NC}"
+}
+
 # Fungsi utama
 main() {
     clear_screen
@@ -105,6 +116,7 @@ main() {
     setup_license
     install_dependencies
     create_alias
+    create_akira_script
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Memuat konfigurasi baru...${NC}"
@@ -117,6 +129,7 @@ main() {
     echo -e "${GREEN}Konfigurasi baru berhasil dimuat.${NC}"
     echo -e "${YELLOW}Anda dapat menjalankan Telegram Automation Tool dengan perintah 'akira'.${NC}"
     echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests${NC}"
+    echo -e "${YELLOW}Catatan: Jika perintah 'akira' tidak berfungsi, coba keluar dan masuk kembali ke terminal atau jalankan 'source ~/.bashrc'.${NC}"
 }
 
 # Jalankan fungsi utama
