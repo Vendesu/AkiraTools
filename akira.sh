@@ -16,6 +16,9 @@ LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 # AkiraTools URL
 AKIRA_URL="https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip"
 
+# Python packages to install
+PYTHON_PACKAGES="telethon requests python-dotenv schedule"
+
 # Function to display a centered message
 center_message() {
     message="$1"
@@ -118,7 +121,7 @@ if [ -n "$license_info" ]; then
 
     # Install required Python packages
     echo -e "\n${BLUE}Installing required Python packages...${NC}"
-    pip install -r requirements.txt > /dev/null 2>&1 &
+    pip install $PYTHON_PACKAGES > /dev/null 2>&1 &
     loading_animation $!
 
     # Run akiratools.py
