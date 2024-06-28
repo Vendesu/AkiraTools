@@ -61,27 +61,10 @@ validate_license() {
     local name="$1"
     echo -e "${YELLOW}Memvalidasi lisensi...${NC}"
 
-    echo "Debug: LICENSE_URL = $LICENSE_URL"
-    echo "Debug: Mencoba mengunduh file lisensi..."
-    if ! licenses=$(wget -qO- "$LICENSE_URL"); then
-        echo -e "${RED}Gagal mengunduh file lisensi. Memeriksa koneksi internet...${NC}"
-        if ! ping -c 1 google.com &> /dev/null; then
-            echo -e "${RED}Tidak ada koneksi internet. Silakan periksa koneksi Anda dan coba lagi.${NC}"
-        else
-            echo -e "${RED}Koneksi internet aktif, tetapi gagal mengunduh file lisensi. Silakan coba lagi nanti atau hubungi administrator.${NC}"
-        fi
-        return 1
-    fi
+    # Mengunduh file lisensi
+    local licenses=$(wget -qO- "$LICENSE_URL")
 
-    echo "Debug: Isi file lisensi:"
-    echo "$licenses"
-
-    if [[ -z "$licenses" ]]; then
-        echo -e "${RED}File lisensi kosong atau tidak dapat diakses.${NC}"
-        return 1
-    fi
-
-    if echo "$licenses" | grep -q "$name"; then
+    if [[ $licenses == *"$name"* ]]; then
         echo -e "${GREEN}Lisensi valid.${NC}"
         return 0
     else
