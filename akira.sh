@@ -7,10 +7,11 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-LICENSE_FILE = os.path.expanduser("~/.lisensi_otomasi_telegram")
-
 # Nama folder tersembunyi
 HIDDEN_FOLDER="$HOME/.akira_tools"
+
+# File lisensi
+LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 
 # URL lisensi
 LICENSE_URL="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
@@ -52,7 +53,7 @@ setup_environment() {
         mkdir -p "$HIDDEN_FOLDER" && cd "$HIDDEN_FOLDER" &&
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
         unzip -q temp.zip && rm temp.zip &&
-        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
+        chmod -R 755 *.py
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
@@ -81,7 +82,7 @@ setup_license() {
     read -p "Masukkan nama Anda: " name
 
     if validate_license "$name"; then
-        echo "$name" > "$HIDDEN_FOLDER/.lisensi_otomasi_telegram"
+        echo "$name" > "$LICENSE_FILE"
         echo -e "${GREEN}Lisensi berhasil disiapkan.${NC}"
     else
         echo -e "${RED}Gagal menyiapkan lisensi. Instalasi dibatalkan.${NC}"
@@ -93,13 +94,11 @@ setup_license() {
 install_dependencies() {
     echo -e "${YELLOW}Memeriksa dan menginstal dependensi...${NC}"
 
-    # Memeriksa dan menginstal Python 3
     if ! command -v python3 &> /dev/null; then
         echo -e "${YELLOW}Menginstal Python 3...${NC}"
         sudo apt-get update && sudo apt-get install -y python3 python3-pip
     fi
 
-    # Menginstal atau memperbarui Telethon dan dependensi lainnya
     echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
     (python3 -m pip install --user --upgrade pip telethon colorama requests) &
     show_loading $!
@@ -122,7 +121,6 @@ python3 $HIDDEN_FOLDER/akiratools.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
 
-    # Menambahkan $HOME/.local/bin ke PATH jika belum ada
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
         export PATH="$HOME/.local/bin:$PATH"
@@ -136,7 +134,6 @@ main() {
     clear_screen
     print_header
 
-    # Periksa ketersediaan tools
     if ! command -v wget &> /dev/null || ! command -v unzip &> /dev/null; then
         echo -e "${RED}Error: wget atau unzip tidak tersedia. Menginstal...${NC}"
         sudo apt-get update && sudo apt-get install -y wget unzip
@@ -150,7 +147,6 @@ main() {
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Memuat konfigurasi baru...${NC}"
 
-    # Memuat .bashrc secara otomatis
     if [ -f "$HOME/.bashrc" ]; then
         source "$HOME/.bashrc"
     fi
