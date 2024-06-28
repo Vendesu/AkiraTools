@@ -7,8 +7,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Nama folder tersembunyi (tidak ditampilkan ke pengguna)
-HIDDEN_FOLDER=".akira_tools"
+# Nama folder tersembunyi
+HIDDEN_FOLDER="$HOME/.akira_tools"
 
 # Fungsi untuk animasi loading
 show_loading() {
@@ -46,7 +46,8 @@ setup_environment() {
     (
         mkdir -p "$HIDDEN_FOLDER" && cd "$HIDDEN_FOLDER" &&
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
-        unzip -q temp.zip && chmod -R 777 * && rm temp.zip
+        unzip -q temp.zip && rm temp.zip &&
+        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
@@ -72,7 +73,7 @@ install_dependencies() {
 
     # Menginstal atau memperbarui Telethon dan dependensi lainnya
     echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
-    (python3 -m pip install --upgrade pip telethon colorama requests) &
+    (python3 -m pip install --user --upgrade pip telethon colorama requests) &
     show_loading $!
     
     if [ $? -eq 0 ]; then
@@ -83,21 +84,22 @@ install_dependencies() {
     fi
 }
 
-# Fungsi untuk membuat alias "akira"
-create_alias() {
-    echo -e "${YELLOW}Menyiapkan perintah 'akira'...${NC}"
-    echo "alias akira='python3 $HOME/$HIDDEN_FOLDER/akiratools.py'" >> ~/.bashrc
-    echo -e "${GREEN}Perintah 'akira' berhasil disiapkan.${NC}"
-}
-
 # Fungsi untuk membuat skrip akira
 create_akira_script() {
     echo -e "${YELLOW}Membuat skrip akira...${NC}"
-    cat > /usr/local/bin/akira << EOL
+    mkdir -p "$HOME/.local/bin"
+    cat > "$HOME/.local/bin/akira" << EOL
 #!/bin/bash
-python3 $HOME/$HIDDEN_FOLDER/akiratools.py
+python3 $HIDDEN_FOLDER/akiratools.py "\$@"
 EOL
-    chmod +x /usr/local/bin/akira
+    chmod +x "$HOME/.local/bin/akira"
+    
+    # Menambahkan $HOME/.local/bin ke PATH jika belum ada
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+    
     echo -e "${GREEN}Skrip akira berhasil dibuat.${NC}"
 }
 
@@ -115,15 +117,14 @@ main() {
     setup_environment
     setup_license
     install_dependencies
-    create_alias
     create_akira_script
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Memuat konfigurasi baru...${NC}"
     
     # Memuat .bashrc secara otomatis
-    if [ -f ~/.bashrc ]; then
-        source ~/.bashrc
+    if [ -f "$HOME/.bashrc" ]; then
+        source "$HOME/.bashrc"
     fi
     
     echo -e "${GREEN}Konfigurasi baru berhasil dimuat.${NC}"
