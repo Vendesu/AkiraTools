@@ -7,6 +7,8 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+LICENSE_FILE = os.path.expanduser("~/.lisensi_otomasi_telegram")
+
 # Nama folder tersembunyi
 HIDDEN_FOLDER="$HOME/.akira_tools"
 
