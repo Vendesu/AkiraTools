@@ -59,16 +59,32 @@ if [ $? -ne 0 ]; then
 fi
 
 # Check if the user's name is in the licenses
-if echo "$licenses" | grep -qi "$user_name"; then
-    # Extract the license information
-    license_info=$(echo "$licenses" | grep -i "$user_name")
+license_info=$(echo "$licenses" | grep -i "^$user_name,")
+
+if [ -n "$license_info" ]; then
+    # Extract license details
+    IFS=',' read -r name duration start_date end_date <<< "$license_info"
+    
+    # Calculate remaining days
+    current_date=$(date +%s)
+    end_date_seconds=$(date -d "$end_date" +%s)
+    remaining_days=$(( (end_date_seconds - current_date) / 86400 ))
+
+    if [ $remaining_days -le 0 ]; then
+        echo -e "\n${RED}Your license has expired. Please contact the administrator for renewal.${NC}"
+        exit 1
+    fi
     
     # Save the license to the file
     echo "$license_info" > "$LICENSE_FILE"
     
     echo -e "\n${GREEN}License installed successfully!${NC}"
     echo -e "License details:"
-    echo -e "${YELLOW}$license_info${NC}"
+    echo -e "${YELLOW}Name: $name"
+    echo -e "Duration: $duration days"
+    echo -e "Start Date: $start_date"
+    echo -e "End Date: $end_date"
+    echo -e "Remaining Days: $remaining_days${NC}"
 
     # Download AkiraTools
     echo -e "\n${BLUE}Downloading AkiraTools...${NC}"
