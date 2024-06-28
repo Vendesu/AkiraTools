@@ -14,7 +14,7 @@ LICENSE_URL="https://raw.githubusercontent.com/Vendesu/ijin/main/licenses.txt"
 LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 
 # AkiraTools URL
-AKIRA_URL="https://github.com/Vendesu/AkiraTools/raw/main/akira"
+AKIRA_URL="https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip"
 
 # Function to display a centered message
 center_message() {
@@ -90,7 +90,7 @@ if [ -n "$license_info" ]; then
 
     # Download AkiraTools
     echo -e "\n${BLUE}Downloading AkiraTools...${NC}"
-    wget -q "$AKIRA_URL" &
+    wget -q "$AKIRA_URL" -O akiraa.zip &
     loading_animation $!
     
     if [ $? -ne 0 ]; then
@@ -100,13 +100,16 @@ if [ -n "$license_info" ]; then
 
     # Unzip the downloaded file
     echo -e "\n${BLUE}Extracting AkiraTools...${NC}"
-    unzip -o akira > /dev/null 2>&1 &
+    unzip -o akiraa.zip > /dev/null 2>&1 &
     loading_animation $!
 
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to extract AkiraTools.${NC}"
         exit 1
     fi
+
+    # Remove the zip file
+    rm akiraa.zip
 
     # Give execute permissions to all extracted files
     echo -e "\n${BLUE}Setting permissions...${NC}"
