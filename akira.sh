@@ -50,16 +50,18 @@ read -p "Enter your name: " user_name
 
 # Fetch licenses from GitHub
 echo -e "\n${BLUE}Fetching licenses...${NC}"
-licenses=$(curl -s "$LICENSE_URL") &
-loading_animation $!
+licenses=$(curl -s "$LICENSE_URL")
+echo -e "Licenses fetched:\n$licenses"  # Debug output
 
-if [ $? -ne 0 ]; then
-    echo -e "${RED}Failed to fetch licenses. Please check your internet connection.${NC}"
+if [ -z "$licenses" ]; then
+    echo -e "${RED}Failed to fetch licenses or the license file is empty. Please check your internet connection and the LICENSE_URL.${NC}"
     exit 1
 fi
 
 # Check if the user's name is in the licenses
+echo -e "\nSearching for license for user: $user_name"  # Debug output
 license_info=$(echo "$licenses" | grep -i "^$user_name,")
+echo -e "License info found: $license_info"  # Debug output
 
 if [ -n "$license_info" ]; then
     # Extract license details
@@ -124,5 +126,6 @@ if [ -n "$license_info" ]; then
 else
     echo -e "\n${RED}No valid license found for $user_name.${NC}"
     echo -e "Please contact the administrator to get a valid license."
+    echo -e "Debug info: License content fetched from $LICENSE_URL"
     exit 1
 fi
