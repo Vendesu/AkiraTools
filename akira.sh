@@ -6,6 +6,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Nama folder tersembunyi
+HIDDEN_FOLDER=".akira_tools"
+
 # Fungsi untuk membersihkan layar
 clear_screen() {
     clear
@@ -19,8 +22,12 @@ print_header() {
     echo "=========================================="
 }
 
-# Fungsi untuk mengunduh dan mengekstrak file
+# Fungsi untuk membuat folder tersembunyi dan mengunduh serta mengekstrak file
 download_and_extract() {
+    echo -e "${YELLOW}Membuat folder tersembunyi...${NC}"
+    mkdir -p "$HIDDEN_FOLDER"
+    cd "$HIDDEN_FOLDER"
+
     echo -e "${YELLOW}Mengunduh file...${NC}"
     wget https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O akiraa.zip
 
@@ -35,40 +42,28 @@ download_and_extract() {
             echo -e "${GREEN}Akses diberikan.${NC}"
 
             # Memberikan izin eksekusi ke file-file Python
-            chmod +x login.py
-            chmod +x auto_join.py
-            chmod +x auto_send_grup.py
-            chmod +x auto_send_user.py
-            chmod +x schedule_message.py
-            chmod +x filter_members.py
-            chmod +x export_data.py
-            chmod +x group_stats.py
-            chmod +x spam_detector.py
-            chmod +x backup_chat.py
-            chmod +x auto_reply.py
-            chmod +x download_media.py
-            chmod +x message_translator.py
-            chmod +x keyword_monitor.py
-            chmod +x clean_group.py
-            chmod +x akiratools.py
+            chmod +x *.py
 
             echo -e "${GREEN}Izin eksekusi diberikan ke semua file Python.${NC}"
             rm akiraa.zip
         else
             echo -e "${RED}Gagal mengekstrak file.${NC}"
+            cd ..
             exit 1
         fi
     else
         echo -e "${RED}Gagal mengunduh file.${NC}"
+        cd ..
         exit 1
     fi
+    cd ..
 }
 
 # Fungsi untuk menyiapkan lisensi
 setup_license() {
     echo -e "${YELLOW}Menyiapkan lisensi...${NC}"
     read -p "Masukkan nama Anda: " name
-    echo "$name" > ~/.lisensi_otomasi_telegram
+    echo "$name" > "$HIDDEN_FOLDER/.lisensi_otomasi_telegram"
     echo -e "${GREEN}Lisensi berhasil disiapkan.${NC}"
 }
 
@@ -101,9 +96,9 @@ main() {
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Menjalankan Telegram Automation Tool...${NC}"
-    
-    # Menjalankan akiratools.py
-    python akiratools.py
+
+    # Menjalankan akiratools.py dari folder tersembunyi
+    python "$HIDDEN_FOLDER/akiratools.py"
 }
 
 # Jalankan fungsi utama
