@@ -33,7 +33,7 @@ download_and_extract() {
             echo -e "${YELLOW}Memberikan akses penuh ke semua file...${NC}"
             chmod -R 777 *
             echo -e "${GREEN}Akses diberikan.${NC}"
-            
+
             # Memberikan izin eksekusi ke file-file Python
             chmod +x login.py
             chmod +x auto_join.py
@@ -50,7 +50,8 @@ download_and_extract() {
             chmod +x message_translator.py
             chmod +x keyword_monitor.py
             chmod +x clean_group.py
-            
+            chmod +x akiratools.py
+
             echo -e "${GREEN}Izin eksekusi diberikan ke semua file Python.${NC}"
             rm akiraa.zip
         else
@@ -99,7 +100,10 @@ main() {
     install_dependencies
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
-    echo -e "${YELLOW}Anda sekarang dapat menjalankan script main.py untuk memulai Telegram Automation Tool.${NC}"
+    echo -e "${YELLOW}Menjalankan Telegram Automation Tool...${NC}"
+    
+    # Menjalankan akiratools.py
+    python akiratools.py
 }
 
 # Jalankan fungsi utama
