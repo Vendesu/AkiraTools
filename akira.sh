@@ -60,10 +60,10 @@ setup_environment() {
 validate_license() {
     local name="$1"
     echo -e "${YELLOW}Memvalidasi lisensi...${NC}"
-    
+
     # Mengunduh file lisensi
     local licenses=$(wget -qO- "$LICENSE_URL")
-    
+
     if [[ $licenses == *"$name"* ]]; then
         echo -e "${GREEN}Lisensi valid.${NC}"
         return 0
@@ -77,7 +77,7 @@ validate_license() {
 setup_license() {
     echo -e "${YELLOW}Menyiapkan lisensi...${NC}"
     read -p "Masukkan nama Anda: " name
-    
+
     if validate_license "$name"; then
         echo "$name" > "$HIDDEN_FOLDER/.lisensi_otomasi_telegram"
         echo -e "${GREEN}Lisensi berhasil disiapkan.${NC}"
@@ -90,7 +90,7 @@ setup_license() {
 # Fungsi untuk menginstal dependensi
 install_dependencies() {
     echo -e "${YELLOW}Memeriksa dan menginstal dependensi...${NC}"
-    
+
     # Memeriksa dan menginstal Python 3
     if ! command -v python3 &> /dev/null; then
         echo -e "${YELLOW}Menginstal Python 3...${NC}"
@@ -101,7 +101,7 @@ install_dependencies() {
     echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
     (python3 -m pip install --user --upgrade pip telethon colorama requests) &
     show_loading $!
-    
+
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}Semua dependensi berhasil diinstal.${NC}"
     else
@@ -119,13 +119,13 @@ create_akira_script() {
 python3 $HIDDEN_FOLDER/akiratools.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
-    
+
     # Menambahkan $HOME/.local/bin ke PATH jika belum ada
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
         export PATH="$HOME/.local/bin:$PATH"
     fi
-    
+
     echo -e "${GREEN}Skrip akira berhasil dibuat.${NC}"
 }
 
@@ -147,12 +147,12 @@ main() {
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Memuat konfigurasi baru...${NC}"
-    
+
     # Memuat .bashrc secara otomatis
     if [ -f "$HOME/.bashrc" ]; then
         source "$HOME/.bashrc"
     fi
-    
+
     echo -e "${GREEN}Konfigurasi baru berhasil dimuat.${NC}"
     echo -e "${YELLOW}Anda dapat menjalankan Telegram Automation Tool dengan perintah 'akira'.${NC}"
     echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests${NC}"
