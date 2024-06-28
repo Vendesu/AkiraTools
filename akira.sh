@@ -62,13 +62,23 @@ setup_license() {
 
 # Fungsi untuk menginstal dependensi
 install_dependencies() {
-    echo -e "${YELLOW}Menginstal dependensi...${NC}"
-    (pip install -q telethon colorama requests) &
+    echo -e "${YELLOW}Memeriksa dan menginstal dependensi...${NC}"
+    
+    # Memeriksa dan menginstal Python 3
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${YELLOW}Menginstal Python 3...${NC}"
+        sudo apt-get update && sudo apt-get install -y python3 python3-pip
+    fi
+
+    # Menginstal atau memperbarui Telethon dan dependensi lainnya
+    echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
+    (python3 -m pip install --upgrade pip telethon colorama requests) &
     show_loading $!
+    
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}Dependensi berhasil diinstal.${NC}"
+        echo -e "${GREEN}Semua dependensi berhasil diinstal.${NC}"
     else
-        echo -e "${RED}Gagal menginstal dependensi.${NC}"
+        echo -e "${RED}Gagal menginstal beberapa dependensi. Silakan coba install manual.${NC}"
         exit 1
     fi
 }
@@ -76,7 +86,7 @@ install_dependencies() {
 # Fungsi untuk membuat alias "akira"
 create_alias() {
     echo -e "${YELLOW}Menyiapkan perintah 'akira'...${NC}"
-    echo "alias akira='python $HOME/$HIDDEN_FOLDER/akiratools.py'" >> ~/.bashrc
+    echo "alias akira='python3 $HOME/$HIDDEN_FOLDER/akiratools.py'" >> ~/.bashrc
     echo -e "${GREEN}Perintah 'akira' berhasil disiapkan.${NC}"
 }
 
@@ -86,9 +96,9 @@ main() {
     print_header
 
     # Periksa ketersediaan tools
-    if ! command -v wget &> /dev/null || ! command -v unzip &> /dev/null || ! command -v pip &> /dev/null; then
-        echo -e "${RED}Error: Beberapa tools diperlukan tidak tersedia. Mohon periksa instalasi sistem Anda.${NC}"
-        exit 1
+    if ! command -v wget &> /dev/null || ! command -v unzip &> /dev/null; then
+        echo -e "${RED}Error: wget atau unzip tidak tersedia. Menginstal...${NC}"
+        sudo apt-get update && sudo apt-get install -y wget unzip
     fi
 
     setup_environment
@@ -106,6 +116,7 @@ main() {
     
     echo -e "${GREEN}Konfigurasi baru berhasil dimuat.${NC}"
     echo -e "${YELLOW}Anda dapat menjalankan Telegram Automation Tool dengan perintah 'akira'.${NC}"
+    echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests${NC}"
 }
 
 # Jalankan fungsi utama
