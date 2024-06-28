@@ -41,12 +41,29 @@ loading_animation() {
     printf "    \b\b\b\b"
 }
 
+# Function to install Python and pip if not already installed
+install_python_and_pip() {
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${YELLOW}Python 3 is not installed. Installing...${NC}"
+        sudo apt-get update
+        sudo apt-get install -y python3
+    fi
+
+    if ! command -v pip3 &> /dev/null; then
+        echo -e "${YELLOW}pip3 is not installed. Installing...${NC}"
+        sudo apt-get install -y python3-pip
+    fi
+}
+
 # Clear the screen
 clear
 
 # Display welcome message
 center_message "TELEGRAM AUTOMATION TOOL INSTALLER"
 echo -e "${YELLOW}Created by Akira${NC}\n"
+
+# Install Python and pip if not already installed
+install_python_and_pip
 
 # Prompt for user's name
 read -p "Enter your name: " user_name
@@ -121,13 +138,13 @@ if [ -n "$license_info" ]; then
 
     # Install required Python packages
     echo -e "\n${BLUE}Installing required Python packages...${NC}"
-    pip install $PYTHON_PACKAGES > /dev/null 2>&1 &
+    pip3 install $PYTHON_PACKAGES > /dev/null 2>&1 &
     loading_animation $!
 
     # Run akiratools.py
     echo -e "\n${GREEN}Installation complete. Starting AkiraTools...${NC}"
     sleep 2
-    python akiratools.py
+    python3 akiratools.py
 
 else
     echo -e "\n${RED}No valid license found for $user_name.${NC}"
