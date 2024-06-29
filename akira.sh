@@ -120,7 +120,7 @@ create_akira_script() {
     cat > "$HOME/.local/bin/akira" << EOL
 #!/bin/bash
 cd "$HIDDEN_FOLDER"
-python3 akirastore.py "\$@"
+python3 akiratools.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
 
