@@ -51,8 +51,14 @@ setup_environment() {
     (
         mkdir -p "$HIDDEN_FOLDER" && cd "$HIDDEN_FOLDER" &&
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
-        unzip -q temp.zip && rm temp.zip &&
-        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
+        unzip -q temp.zip &&
+        for file in *; do
+            if [ "$file" != "temp.zip" ]; then
+                mv "$file" ".$file"
+            fi
+        done &&
+        rm temp.zip &&
+        chmod -R 755 .*.py  # Memberikan akses eksekusi ke semua file Python tersembunyi
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
@@ -99,9 +105,9 @@ install_dependencies() {
         sudo apt-get update && sudo apt-get install -y python3 python3-pip
     fi
 
-    # Menginstal atau memperbarui Telethon dan dependensi lainnya
+    # Menginstal atau memperbarui Telethon, aiogram, dan dependensi lainnya
     echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
-    (python3 -m pip install --user --upgrade pip telethon colorama requests) &
+    (python3 -m pip install --user --upgrade pip telethon colorama requests aiogram) &
     show_loading $!
 
     if [ $? -eq 0 ]; then
@@ -118,7 +124,8 @@ create_akira_script() {
     mkdir -p "$HOME/.local/bin"
     cat > "$HOME/.local/bin/akira" << EOL
 #!/bin/bash
-python3 $HIDDEN_FOLDER/akiratools.py "\$@"
+cd "$HIDDEN_FOLDER"
+python3 .akirastore.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
 
@@ -158,7 +165,7 @@ main() {
     echo -e "${GREEN}Instalasi selesai!${NC}"
     echo -e "${YELLOW}Telegram Automation Tool akan otomatis terbuka saat Anda membuka terminal baru.${NC}"
     echo -e "${YELLOW}Untuk menjalankannya secara manual, gunakan perintah 'akira'.${NC}"
-    echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests${NC}"
+    echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests, aiogram${NC}"
     echo -e "${YELLOW}Catatan: Perubahan akan berlaku setelah Anda membuka terminal baru atau menjalankan 'source ~/.bashrc'.${NC}"
 }
 
