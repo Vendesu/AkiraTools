@@ -10,7 +10,6 @@ NC='\033[0m' # No Color
 # Nama folder tersembunyi
 HIDDEN_FOLDER="$HOME/.akira_tools"
 
-# File lisensi
 LICENSE_FILE="$HOME/.lisensi_otomasi_telegram"
 
 # URL lisensi
@@ -53,7 +52,7 @@ setup_environment() {
         mkdir -p "$HIDDEN_FOLDER" && cd "$HIDDEN_FOLDER" &&
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
         unzip -q temp.zip && rm temp.zip &&
-        chmod -R 755 *.py
+        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
@@ -94,11 +93,13 @@ setup_license() {
 install_dependencies() {
     echo -e "${YELLOW}Memeriksa dan menginstal dependensi...${NC}"
 
+    # Memeriksa dan menginstal Python 3
     if ! command -v python3 &> /dev/null; then
         echo -e "${YELLOW}Menginstal Python 3...${NC}"
         sudo apt-get update && sudo apt-get install -y python3 python3-pip
     fi
 
+    # Menginstal atau memperbarui Telethon dan dependensi lainnya
     echo -e "${YELLOW}Menginstal modul Python yang diperlukan...${NC}"
     (python3 -m pip install --user --upgrade pip telethon colorama requests) &
     show_loading $!
@@ -121,6 +122,7 @@ python3 $HIDDEN_FOLDER/akiratools.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
 
+    # Menambahkan $HOME/.local/bin ke PATH jika belum ada
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
         export PATH="$HOME/.local/bin:$PATH"
@@ -129,11 +131,19 @@ EOL
     echo -e "${GREEN}Skrip akira berhasil dibuat.${NC}"
 }
 
+# Fungsi untuk menambahkan akira ke .bashrc
+add_akira_to_bashrc() {
+    echo -e "${YELLOW}Menambahkan akira ke .bashrc...${NC}"
+    echo 'akira' >> "$HOME/.bashrc"
+    echo -e "${GREEN}akira berhasil ditambahkan ke .bashrc${NC}"
+}
+
 # Fungsi utama
 main() {
     clear_screen
     print_header
 
+    # Periksa ketersediaan tools
     if ! command -v wget &> /dev/null || ! command -v unzip &> /dev/null; then
         echo -e "${RED}Error: wget atau unzip tidak tersedia. Menginstal...${NC}"
         sudo apt-get update && sudo apt-get install -y wget unzip
@@ -143,18 +153,13 @@ main() {
     setup_license
     install_dependencies
     create_akira_script
+    add_akira_to_bashrc
 
     echo -e "${GREEN}Instalasi selesai!${NC}"
-    echo -e "${YELLOW}Memuat konfigurasi baru...${NC}"
-
-    if [ -f "$HOME/.bashrc" ]; then
-        source "$HOME/.bashrc"
-    fi
-
-    echo -e "${GREEN}Konfigurasi baru berhasil dimuat.${NC}"
-    echo -e "${YELLOW}Anda dapat menjalankan Telegram Automation Tool dengan perintah 'akira'.${NC}"
+    echo -e "${YELLOW}Telegram Automation Tool akan otomatis terbuka saat Anda membuka terminal baru.${NC}"
+    echo -e "${YELLOW}Untuk menjalankannya secara manual, gunakan perintah 'akira'.${NC}"
     echo -e "${BLUE}Modul yang digunakan: Python 3, Telethon, Colorama, Requests${NC}"
-    echo -e "${YELLOW}Catatan: Jika perintah 'akira' tidak berfungsi, coba keluar dan masuk kembali ke terminal atau jalankan 'source ~/.bashrc'.${NC}"
+    echo -e "${YELLOW}Catatan: Perubahan akan berlaku setelah Anda membuka terminal baru atau menjalankan 'source ~/.bashrc'.${NC}"
 }
 
 # Jalankan fungsi utama
