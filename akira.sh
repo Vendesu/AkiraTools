@@ -45,7 +45,6 @@ print_header() {
     echo -e "${NC}"
 }
 
-# Fungsi untuk menyiapkan lingkungan
 setup_environment() {
     echo -e "${YELLOW}Menyiapkan lingkungan...${NC}"
     (
@@ -53,7 +52,7 @@ setup_environment() {
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
         unzip -q temp.zip &&
         rm temp.zip &&
-        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
+        chmod -R 755 *  # Memberikan akses eksekusi ke semua file (bukan hanya *.py)
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
