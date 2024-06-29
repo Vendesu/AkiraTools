@@ -52,13 +52,8 @@ setup_environment() {
         mkdir -p "$HIDDEN_FOLDER" && cd "$HIDDEN_FOLDER" &&
         wget -q https://github.com/Vendesu/AkiraTools/raw/main/akiraa.zip -O temp.zip &&
         unzip -q temp.zip &&
-        for file in *; do
-            if [ "$file" != "temp.zip" ]; then
-                mv "$file" ".$file"
-            fi
-        done &&
         rm temp.zip &&
-        chmod -R 755 .*.py  # Memberikan akses eksekusi ke semua file Python tersembunyi
+        chmod -R 755 *.py  # Memberikan akses eksekusi ke semua file Python
     ) &
     show_loading $!
     echo -e "${GREEN}Lingkungan berhasil disiapkan.${NC}"
@@ -125,7 +120,7 @@ create_akira_script() {
     cat > "$HOME/.local/bin/akira" << EOL
 #!/bin/bash
 cd "$HIDDEN_FOLDER"
-python3 .akirastore.py "\$@"
+python3 akirastore.py "\$@"
 EOL
     chmod +x "$HOME/.local/bin/akira"
 
