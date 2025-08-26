@@ -14,6 +14,18 @@ AkiraTools adalah alat otomasi Telegram yang dikembangkan oleh Akira. Tool ini m
 
 ## 🚀 Cara Instalasi
 
+### ⚡ Instalasi Cepat (Satu Baris)
+
+**Untuk instalasi langsung tanpa clone repository:**
+
+```bash
+# Menggunakan wget
+wget -O akira.sh https://raw.githubusercontent.com/Vendesu/AkiraTools/main/akira.sh && chmod +x akira.sh && ./akira.sh
+
+# Atau menggunakan curl
+curl -o akira.sh https://raw.githubusercontent.com/Vendesu/AkiraTools/main/akira.sh && chmod +x akira.sh && ./akira.sh
+```
+
 ### Persyaratan Sistem
 - Sistem operasi Linux
 - Akses internet
@@ -21,7 +33,21 @@ AkiraTools adalah alat otomasi Telegram yang dikembangkan oleh Akira. Tool ini m
 
 ### Langkah Instalasi
 
-1. **Clone atau download repository ini**
+#### Opsi 1: Instalasi Langsung (Direkomendasikan)
+
+**Menggunakan wget:**
+```bash
+wget -O akira.sh https://raw.githubusercontent.com/Vendesu/AkiraTools/main/akira.sh && chmod +x akira.sh && ./akira.sh
+```
+
+**Menggunakan curl:**
+```bash
+curl -o akira.sh https://raw.githubusercontent.com/Vendesu/AkiraTools/main/akira.sh && chmod +x akira.sh && ./akira.sh
+```
+
+#### Opsi 2: Clone Repository
+
+1. **Clone repository ini**
    ```bash
    git clone <repository-url>
    cd AkiraTools
@@ -81,6 +107,8 @@ Tool akan membuat folder tersembunyi di `~/.akira_tools` yang berisi semua file 
 - Pastikan Anda memiliki lisensi yang valid sebelum menggunakan tool
 - Tool memerlukan koneksi internet untuk validasi lisensi dan download dependensi
 - Beberapa fitur mungkin memerlukan konfigurasi API Telegram tambahan
+- **URL Repository**: Pastikan URL `https://raw.githubusercontent.com/Vendesu/AkiraTools/main/akira.sh` dapat diakses
+- Jika instalasi langsung gagal, gunakan opsi clone repository sebagai alternatif
 
 ## 🛠️ Troubleshooting
 
@@ -97,6 +125,12 @@ Tool akan membuat folder tersembunyi di `~/.akira_tools` yang berisi semua file 
 3. **Command 'akira' tidak ditemukan**
    - Restart terminal atau jalankan `source ~/.bashrc`
    - Periksa apakah `~/.local/bin` ada di PATH
+
+4. **Instalasi langsung gagal (wget/curl error)**
+   - Periksa koneksi internet Anda
+   - Pastikan URL repository dapat diakses
+   - Coba gunakan opsi clone repository sebagai alternatif
+   - Periksa apakah firewall memblokir akses ke GitHub
 
 ## 📞 Dukungan
 
